@@ -1,5 +1,6 @@
 package kr.co.study.restfulservice.controller;
 
+import jakarta.validation.Valid;
 import kr.co.study.restfulservice.bean.User;
 import kr.co.study.restfulservice.dao.UserDaoService;
 import kr.co.study.restfulservice.exception.UserNotFoundException;
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser (@RequestBody User user) {
+    public ResponseEntity<User> createUser (@Valid @RequestBody User user) {
         User savedUser = service.save(user);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity createUser (@PathVariable int id) {
+    public ResponseEntity createUser ( @PathVariable int id) {
         User deletedUser = service.deleteById(id);
 
         if (deletedUser == null) {
