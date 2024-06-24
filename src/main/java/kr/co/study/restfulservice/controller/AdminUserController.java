@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import kr.co.study.restfulservice.bean.AdminUser;
+import kr.co.study.restfulservice.bean.AdminUserV2;
 import kr.co.study.restfulservice.bean.User;
 import kr.co.study.restfulservice.dao.UserDaoService;
 import kr.co.study.restfulservice.exception.UserNotFoundException;
@@ -25,8 +26,8 @@ public class AdminUserController {
 
     private final UserDaoService service;
 
-    @GetMapping("/users/{id}")
-    public MappingJacksonValue findAdminUser(@PathVariable int id) {
+    @GetMapping("/v1/users/{id}")
+    public MappingJacksonValue findAdminUserV1(@PathVariable int id) {
         User user = service.findOne(id);
 
         AdminUser adminUser = new AdminUser();
@@ -38,6 +39,27 @@ public class AdminUserController {
 
         SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name", "joinDate", "password", "ssn");
         FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo", filter);
+
+        MappingJacksonValue mapping = new MappingJacksonValue(adminUser);
+        mapping.setFilters(filters);
+
+        return mapping;
+    }
+
+    @GetMapping("/v2/users/{id}")
+    public MappingJacksonValue findAdminUserV2(@PathVariable int id) {
+        User user = service.findOne(id);
+
+        AdminUserV2 adminUser = new AdminUserV2();
+        if (user == null) {
+            throw new UserNotFoundException("ID[%s] not found".formatted(id));
+        } else {
+            BeanUtils.copyProperties(user, adminUser);
+            adminUser.setGrade("VIP");
+        }
+
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name", "joinDate", "grade");
+        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfoV2", filter);
 
         MappingJacksonValue mapping = new MappingJacksonValue(adminUser);
         mapping.setFilters(filters);
@@ -62,7 +84,7 @@ public class AdminUserController {
 
         MappingJacksonValue mapping = new MappingJacksonValue(adminUsers);
         mapping.setFilters(filters);
-        
+
         return mapping;
     }
 }
