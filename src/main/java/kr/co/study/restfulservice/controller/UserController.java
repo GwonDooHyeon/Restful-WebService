@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.print.DocFlavor;
 import java.net.URI;
 import java.util.List;
 
@@ -18,6 +17,7 @@ import java.util.List;
 public class UserController {
 
     private final UserDaoService service;
+
 
     @GetMapping("/users")
     public List<User> allUsers() {
@@ -28,7 +28,7 @@ public class UserController {
     public User findUser(@PathVariable int id) {
         User user = service.findOne(id);
         if (user == null) {
-            throw new UserNotFoundException(String.format("ID[%s] not found", id));
+            throw new UserNotFoundException("ID[%s] not found".formatted(id));
         }
 
         return user;
@@ -47,11 +47,11 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity createUser ( @PathVariable int id) {
+    public ResponseEntity<Object> createUser (@PathVariable int id) {
         User deletedUser = service.deleteById(id);
 
         if (deletedUser == null) {
-            throw new UserNotFoundException(String.format("ID[%s] not found", id));
+            throw new UserNotFoundException("ID[%s] not found".formatted(id));
         }
 
         return ResponseEntity.noContent().build();
